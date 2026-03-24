@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bead Pattern Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg-deep: #030305;
+  --bg-card: rgba(15, 15, 20, 0.6);
+  --bg-elevated: rgba(25, 25, 30, 0.8);
+  --border: rgba(255, 255, 255, 0.05);
+  --border-focus: rgba(0, 255, 204, 0.5);
+  --accent: #00ffcc;
+  --accent-secondary: #b026ff;
+  --accent-glow: rgba(0, 255, 204, 0.3);
+  --accent-gradient: linear-gradient(135deg, #00ffcc 0%, #b026ff 100%);
+  --success: #00ffcc;
+  --text-primary: #ffffff;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --radius-pill: 30px;
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 15px var(--accent-glow);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-deep);
+  background-image: 
+    radial-gradient(ellipse 60% 60% at 20% -10%, rgba(0, 255, 204, 0.08), transparent),
+    radial-gradient(ellipse 60% 60% at 80% 110%, rgba(176, 38, 255, 0.08), transparent);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ---------- HEADER ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(3, 3, 5, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.2), inset 0 0 10px rgba(0, 255, 204, 0.1);
+}
+
+.logo-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+.logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-elevated);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background 0.3s ease;
+}
+
+.status-dot.active {
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(104, 211, 145, 0.5);
+}
+
+.status-dot.processing {
+  background: var(--accent);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---------- MAIN LAYOUT ---------- */
+.app {
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  gap: 24px;
+  padding: 24px 32px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ---------- CARDS ---------- */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+}
+
+.card-title svg {
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* ---------- VIEWPORT ---------- */
+.viewport-container {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #000;
+  box-shadow: inset 0 0 0 2px var(--border);
+  transition: box-shadow 0.3s ease;
+}
+
+.viewport-container:hover {
+  box-shadow: inset 0 0 0 2px var(--border-focus), var(--shadow-glow);
+}
+
+.viewport-container canvas {
+  display: block;
+  cursor: grab;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.viewport-container canvas:active {
+  cursor: grabbing;
+}
+
+.crosshair {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: "";
+  position: absolute;
+  background: rgba(99, 179, 237, 0.4);
+}
+
+.crosshair::before {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-0.5px);
+}
+
+.crosshair::after {
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  transform: translateY(-0.5px);
+}
+
+.viewport-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viewport-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.zoom-controls {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  background: rgba(3, 3, 5, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.zoom-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
+}
+
+.zoom-btn:hover {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.zoom-btn:active {
+  background: rgba(0, 255, 204, 0.4);
+}
+
+.zoom-divider {
+  height: 1px;
+  background: var(--border);
+  width: 70%;
+  margin: 0 auto;
+}
+
+/* ---------- CONTROLS ---------- */
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.file-upload {
+  position: relative;
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-pill);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.file-upload:hover .file-upload-button {
+  background: rgba(0, 255, 204, 0.05);
+  box-shadow: var(--shadow-glow);
+}
+
+.file-upload-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-secondary);
+}
+
+.btn-primary {
+  background: var(--accent-gradient);
+  color: #000;
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ---------- MINIMAP ---------- */
+.minimap-section {
+  display: flex;
+  gap: 20px;
+  padding: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.minimap-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+#minimap {
+  width: 100%;
+  height: 100%;
+}
+
+.minimap-rect {
+  position: absolute;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  pointer-events: none;
+  background: rgba(0, 255, 204, 0.1);
+  box-shadow: 
+    0 0 0 9999px rgba(0, 0, 0, 0.6),
+    0 0 15px var(--accent-glow);
+}
+
+.minimap-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.info-row svg {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.info-value {
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* ---------- OUTPUT SECTION ---------- */
+.output-wrapper {
+  display: flex;
+  flex-direction: column;
+  /* height: calc(100vh - 140px); */
+}
+
+.output-grid-container {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.output-grid {
+  display: grid;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 1px;
+  box-shadow: var(--shadow-md);
+}
+
+.output-grid .cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 1px;
+  transition: transform 0.1s ease;
+}
+
+.output-grid .cell:hover {
+  transform: scale(1.2);
+  z-index: 10;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.output-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.output-empty svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.3;
+}
+
+.output-empty p {
+  font-size: 14px;
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+/* ---------- BEAD STATS ---------- */
+.stats-section {
+  border-top: 1px solid var(--border);
+  max-height: 300px;
+  overflow: auto;
+}
+
+.stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+
+.stats-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stats-total {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.stats-list {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease;
+}
+
+.stat-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.stat-color {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.stat-count {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stat-bar {
+  width: 60px;
+  height: 4px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+}
+
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .app {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  
+  .header {
+    padding: 16px;
+  }
+  
+  .output-wrapper {
+    height: auto;
+    min-height: 500px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <circle cx="12" cy="4" r="2"/>
+        <circle cx="12" cy="20" r="2"/>
+        <circle cx="4" cy="12" r="2"/>
+        <circle cx="20" cy="12" r="2"/>
+      </svg>
+    </div>
+    <span class="logo-text">Bead Pattern Studio</span>
+  </div>
+  <div class="header-status">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">Ready</span>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- LEFT PANEL -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        Image Selector
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">70 x 70 grid</span>
+    </div>
+    
+    <div class="card-body">
+      <div class="viewport-container">
+        <canvas id="viewport" width="440" height="440"></canvas>
+        <div class="crosshair"></div>
+        <div class="viewport-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="5 9 2 12 5 15"/>
+            <polyline points="9 5 12 2 15 5"/>
+            <polyline points="15 19 12 22 9 19"/>
+            <polyline points="19 9 22 12 19 15"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <line x1="12" y1="2" x2="12" y2="22"/>
+          </svg>
+          Pan to Crop
+        </div>
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="zoomInBtn">+</button>
+          <div class="zoom-divider"></div>
+          <button class="zoom-btn" id="zoomOutBtn">−</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="controls-section">
+      <div class="file-upload">
+        <input type="file" id="imageInput" accept="image/*" class="file-input" />
+        <div class="file-upload-button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload Image
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button class="btn-secondary" id="snapBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12"/>
+            <polyline points="6 12 2 12"/>
+            <polyline points="12 6 12 2"/>
+            <polyline points="12 22 12 18"/>
+          </svg>
+          Snap to Grid
+        </button>
+        <button class="btn-primary" id="submitBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Generate
+        </button>
+      </div>
+    </div>
+    
+    <div class="minimap-section">
+      <div class="minimap-wrapper">
+        <canvas id="minimap" width="140" height="140"></canvas>
+        <div id="minimapRect" class="minimap-rect"></div>
+      </div>
+      <div class="minimap-info">
+        <div class="info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="11" y1="8" x2="11" y2="14"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+          Zoom Level
+          <span class="info-value" id="zoomLevel">100%</span>
+        </div>
+        <div class="info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Grid Size
+          <span class="info-value">70 × 70</span>
+        </div>
+        <div class="info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          Total Beads
+          <span class="info-value">4,900</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="card output-wrapper">
+    <div class="card-header">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Pattern Output
+      </div>
+    </div>
+    
+    <div class="output-grid-container">
+      <div id="output" class="output-grid">
+        <div class="output-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <p>Upload an image and click Generate to create your bead pattern</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stats-section" id="statsSection" style="display: none;">
+      <div class="stats-header">
+        <span class="stats-title">Bead Usage</span>
+        <span class="stats-total" id="totalBeads">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+          0 beads
+        </span>
+      </div>
+      <div class="stats-list" id="beadStats"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GRID = 70;
+
+const canvas = document.getElementById("viewport");
+const ctx = canvas.getContext("2d");
+
+const mini = document.getElementById("minimap");
+const mctx = mini.getContext("2d");
+const miniRect = document.getElementById("minimapRect");
+
+const output = document.getElementById("output");
+const statusText = document.getElementById("statusText");
+const statusDot = document.getElementById("statusDot");
+const zoomLevelEl = document.getElementById("zoomLevel");
+const zoomInBtn = document.getElementById("zoomInBtn");
+const zoomOutBtn = document.getElementById("zoomOutBtn");
+
+const CROP_SIZE = 340;
+let img = new Image();
+let scale = 1;
+let baseScale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let dragging = false;
+let lx, ly;
+
+function updateStatus(text, state = "idle") {
+  statusText.textContent = text;
+  statusDot.className = "status-dot";
+  if (state === "processing") statusDot.classList.add("processing");
+  if (state === "active") statusDot.classList.add("active");
+}
+
+function updateZoomLevel() {
+  const percent = Math.round((scale / baseScale) * 100);
+  zoomLevelEl.textContent = percent + "%";
+}
+
+// ---------- LOAD IMAGE ----------
+imageInput.onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+
+  img.onload = () => {
+    baseScale = Math.max(canvas.width / img.width, canvas.height / img.height);
+    scale = baseScale;
+    offsetX = canvas.width / 2 - (img.width * scale) / 2;
+    offsetY = canvas.height / 2 - (img.height * scale) / 2;
+    draw();
+    updateStatus("Image loaded", "active");
+    updateZoomLevel();
+  };
+  img.src = URL.createObjectURL(f);
+};
+
+// ---------- DRAW ----------
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!img.src) return;
+
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
+  ctx.drawImage(img, 0, 0);
+  ctx.restore();
+
+  // Draw darkened overlay
+  const cx = (canvas.width - CROP_SIZE) / 2;
+  const cy = (canvas.height - CROP_SIZE) / 2;
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+  ctx.fillRect(0, 0, canvas.width, cy); // Top
+  ctx.fillRect(0, cy + CROP_SIZE, canvas.width, canvas.height - cy - CROP_SIZE); // Bottom
+  ctx.fillRect(0, cy, cx, CROP_SIZE); // Left
+  ctx.fillRect(cx + CROP_SIZE, cy, canvas.width - cx - CROP_SIZE, CROP_SIZE); // Right
+
+  // Draw crop box border
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(cx, cy, CROP_SIZE, CROP_SIZE);
+
+  drawGrid(cx, cy);
+  drawMiniMap();
+  updateZoomLevel();
+}
+
+function drawGrid(cx, cy) {
+  const c = CROP_SIZE / GRID;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  for (let i = 1; i < GRID; i++) {
+    ctx.moveTo(cx + i * c, cy);
+    ctx.lineTo(cx + i * c, cy + CROP_SIZE);
+    ctx.moveTo(cx, cy + i * c);
+    ctx.lineTo(cx + CROP_SIZE, cy + i * c);
+  }
+  ctx.stroke();
+}
+
+// ---------- PAN ----------
+canvas.onmousedown = e => {
+  dragging = true;
+  lx = e.clientX;
+  ly = e.clientY;
+};
+
+window.onmouseup = () => dragging = false;
+
+function clampPan() {
+  if (!img.src) return;
+  
+  const sw = img.width * scale;
+  const sh = img.height * scale;
+  
+  if (sw < canvas.width) {
+    offsetX = Math.max(0, Math.min(canvas.width - sw, offsetX));
+  } else {
+    offsetX = Math.max(canvas.width - sw, Math.min(0, offsetX));
+  }
+  
+  if (sh < canvas.height) {
+    offsetY = Math.max(0, Math.min(canvas.height - sh, offsetY));
+  } else {
+    offsetY = Math.max(canvas.height - sh, Math.min(0, offsetY));
+  }
+}
+
+canvas.onmousemove = e => {
+  if (!dragging) return;
+  offsetX += e.clientX - lx;
+  offsetY += e.clientY - ly;
+  lx = e.clientX;
+  ly = e.clientY;
+  clampPan();
+  draw();
+};
+
+// ---------- ZOOM ----------
+function applyZoom(z, center) {
+  const wx = (center.x - offsetX) / scale;
+  const wy = (center.y - offsetY) / scale;
+  
+  scale *= z;
+  // Allow zooming out until the image perfectly covers just the crop box
+  const minScale = Math.max(CROP_SIZE / img.width, CROP_SIZE / img.height);
+  scale = Math.max(minScale, scale); 
+  
+  offsetX = center.x - wx * scale;
+  offsetY = center.y - wy * scale;
+  
+  clampPan();
+  draw();
+}
+
+zoomInBtn.onclick = () => applyZoom(1.1, {x: canvas.width/2, y: canvas.height/2});
+zoomOutBtn.onclick = () => applyZoom(0.9, {x: canvas.width/2, y: canvas.height/2});
+
+// ---------- SCROLL ZOOM ----------
+canvas.onwheel = e => {
+  if (!img.src) return;
+  e.preventDefault();
+  const z = e.deltaY < 0 ? 1.1 : 0.9;
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+  applyZoom(z, { x: mx, y: my });
+};
+
+// ---------- SNAP ----------
+snapBtn.onclick = () => {
+  const cx = (canvas.width - CROP_SIZE) / 2;
+  const cy = (canvas.height - CROP_SIZE) / 2;
+  const c = CROP_SIZE / GRID;
+  
+  // Align the image so grid lines match up
+  const modX = (offsetX - cx) % c;
+  const modY = (offsetY - cy) % c;
+  offsetX -= modX > c/2 ? modX - c : modX;
+  offsetY -= modY > c/2 ? modY - c : modY;
+  
+  clampPan();
+  draw();
+};
+
+// ---------- MINI MAP ----------
+function drawMiniMap() {
+  if (!img.src) return;
+
+  const mw = mini.width;
+  const mh = mini.height;
+
+  const scaleFit = Math.min(mw / img.width, mh / img.height);
+  const drawW = img.width * scaleFit;
+  const drawH = img.height * scaleFit;
+
+  const padX = (mw - drawW) / 2;
+  const padY = (mh - drawH) / 2;
+
+  mctx.clearRect(0, 0, mw, mh);
+  mctx.drawImage(img, padX, padY, drawW, drawH);
+
+  const rx = padX + (-(offsetX - ((canvas.width - CROP_SIZE)/2)) / scale) * scaleFit;
+  const ry = padY + (-(offsetY - ((canvas.height - CROP_SIZE)/2)) / scale) * scaleFit;
+
+  const viewW = CROP_SIZE / scale;
+  const viewH = CROP_SIZE / scale;
+
+  miniRect.style.width = Math.min(viewW * scaleFit, mw) + "px";
+  miniRect.style.height = Math.min(viewH * scaleFit, mh) + "px";
+  miniRect.style.left = Math.max(0, rx) + "px";
+  miniRect.style.top = Math.max(0, ry) + "px";
+}
+
+// ---------- SUBMIT ----------
+submitBtn.onclick = async () => {
+  if (!img.src) {
+    updateStatus("Please upload an image first", "idle");
+    return;
+  }
+
+  updateStatus("Processing…", "processing");
+
+  const crop = document.createElement("canvas");
+  crop.width = GRID;
+  crop.height = GRID;
+  const cctx = crop.getContext("2d");
+
+  const cx = (canvas.width - CROP_SIZE) / 2;
+  const cy = (canvas.height - CROP_SIZE) / 2;
+
+  cctx.drawImage(
+    img,
+    (cx - offsetX) / scale,
+    (cy - offsetY) / scale,
+    CROP_SIZE / scale,
+    CROP_SIZE / scale,
+    0,
+    0,
+    GRID,
+    GRID
+  );
+
+  const blob = await new Promise(resolve =>
+    crop.toBlob(resolve, "image/png")
+  );
+
+  const form = new FormData();
+  form.append("file", blob, "crop.png");
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/generate", {
+      method: "POST",
+      body: form
+    });
+
+    const result = await res.json();
+    renderGrid(result);
+    renderBeadStats(result);
+    updateStatus("Pattern generated!", "active");
+  } catch (err) {
+    updateStatus("Connection failed - using demo", "idle");
+    // Demo fallback with random colors
+    const demoResult = generateDemoData();
+    renderGrid(demoResult);
+    renderBeadStats(demoResult);
+  }
+};
+
+function generateDemoData() {
+  const palette = {
+    0: { r: 255, g: 107, b: 107 },
+    1: { r: 78, g: 205, b: 196 },
+    2: { r: 255, g: 230, b: 109 },
+    3: { r: 170, g: 166, b: 157 },
+    4: { r: 69, g: 105, b: 144 },
+    5: { r: 247, g: 202, b: 201 }
+  };
+  
+  const grid = [];
+  for (let y = 0; y < GRID; y++) {
+    const row = [];
+    for (let x = 0; x < GRID; x++) {
+      row.push(Math.floor(Math.random() * 6));
+    }
+    grid.push(row);
+  }
+  
+  return { grid, palette, width: GRID, height: GRID };
+}
+
+function renderGrid(gridJson) {
+  const { grid, palette, width, height } = gridJson;
+
+  output.innerHTML = "";
+  output.style.gridTemplateColumns = `repeat(${width}, 8px)`;
+  output.style.width = "fit-content";
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const label = grid[y][x];
+      const color = palette[label];
+
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.style.background = `rgb(${color.r}, ${color.g}, ${color.b})`;
+      cell.title = `RGB(${color.r}, ${color.g}, ${color.b})`;
+
+      output.appendChild(cell);
+    }
+  }
+  
+  document.getElementById("statsSection").style.display = "block";
+}
+
+function renderBeadStats(gridJson) {
+  const { grid, palette } = gridJson;
+  const statsEl = document.getElementById("beadStats");
+  const totalEl = document.getElementById("totalBeads");
+
+  if (!statsEl) return;
+
+  statsEl.innerHTML = "";
+
+  const counts = {};
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      const label = grid[y][x];
+      counts[label] = (counts[label] || 0) + 1;
+    }
+  }
+
+  const rows = Object.entries(counts)
+    .map(([label, count]) => ({
+      label: Number(label),
+      count,
+      color: palette[label],
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const total = rows.reduce((s, r) => s + r.count, 0);
+  const maxCount = Math.max(...rows.map(r => r.count));
+
+  totalEl.innerHTML = `
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+    </svg>
+    ${total.toLocaleString()} beads
+  `;
+
+  rows.forEach(({ color, count }) => {
+    const row = document.createElement("div");
+    row.className = "stat-row";
+
+    row.innerHTML = `
+      <div class="stat-swatch" style="background: rgb(${color.r}, ${color.g}, ${color.b})"></div>
+      <span class="stat-color">RGB(${color.r}, ${color.g}, ${color.b})</span>
+      <div class="stat-bar">
+        <div class="stat-bar-fill" style="width: ${(count / maxCount) * 100}%"></div>
+      </div>
+      <span class="stat-count">${count.toLocaleString()}</span>
+    `;
+
+    statsEl.appendChild(row);
+  });
+}
+
+// Initial grid draw
+draw();
+</script>
+
+</body>
+</html>
+
+
+
+
+<!-- 11	18	19 (Jelly)	27	36 (Car-1)	4( 3 Fishes)			 -->

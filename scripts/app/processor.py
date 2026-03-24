@@ -124,15 +124,16 @@ def saliency_crop(img: Image.Image, img_cv: np.ndarray) -> Image.Image:
 
 
 def letterbox_resize(img: Image.Image, size: tuple) -> Image.Image:
-    target_w, target_h = size
-    bg = img.resize(size, Image.LANCZOS).filter(
-        ImageFilter.GaussianBlur(radius=6)
-    )
-    img.thumbnail(size, Image.LANCZOS)
-    offset_x = (target_w - img.width)  // 2
-    offset_y = (target_h - img.height) // 2
-    bg.paste(img, (offset_x, offset_y))
-    return bg
+    # Force square crop (center) if not already square
+    w, h = img.size
+    if w != h:
+        side = min(w, h)
+        left = (w - side) // 2
+        top  = (h - side) // 2
+        img  = img.crop((left, top, left + side, top + side))
+
+    # Now it's square — simple resize, no stretching needed
+    return img.resize(size, Image.LANCZOS)
 
 
 def enhance(img: Image.Image) -> Image.Image:
