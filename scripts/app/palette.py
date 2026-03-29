@@ -1,38 +1,53 @@
-BEAD_PALETTE = [
-    # ── Neutrals (4) ──────────────────────────────────────
-    (15, 15, 15),       # 0  near-black  (hair, brows, pupils)
-    (55, 52, 50),       # 1  charcoal    (hair shadow, stubble)
-    (150, 148, 145),    # 2  mid gray    (bg shadow, transitions)
-    (255, 255, 255),    # 3  pure white  (background, teeth, eye whites)
+# ── MASTER BEAD INVENTORY (19 Unique Colors Total) ─────────
+# This is carefully merged to stay under your 25 max color limit.
+MASTER_COLORS = {
+    "black":          (0, 0, 0),
+    "dark_gray":      (55, 55, 55),
+    "mid_gray":       (140, 140, 140),
+    "white":          (255, 255, 255),
 
-    # ── Skin tones (6) — expanded to stop red/yellow bleed ─
-    (62, 38, 28),       # 4  deep shadow brown  (nostril, jaw shadow)
-    (105, 68, 45),      # 5  dark brown skin    (shadow side of face)
-    (150, 100, 68),     # 6  warm mid-brown     (mid-shadow transition)
-    (190, 140, 105),    # 7  medium skin        (face body)
-    (220, 175, 148),    # 8  light skin         (forehead, nose bridge)
-    (240, 210, 190),    # 9  skin highlight      (brightest highlights)
+    "skin_deep":      (62, 38, 28),
+    "skin_dark":      (105, 68, 45),
+    "skin_mid":       (150, 100, 68),
+    "skin_light":     (190, 140, 105),
+    "skin_highlight": (220, 175, 148),
+    "skin_bright":    (240, 210, 190),
 
-    # ── Blues (3) — shirt needs gradient ───────────────────
-    (28, 45, 78),       # 10 deep navy          (shirt shadows, collar)
-    (55, 80, 120),      # 11 mid blue           (shirt body)
-    (95, 120, 155),     # 12 steel blue         (shirt highlights/folds)
+    "red_brown":      (130, 75, 50),
+    "cream":          (210, 195, 170),
 
-    # ── Warm accents (2) ──────────────────────────────────
-    (130, 75, 50),      # 13 red-brown          (lips, warm deep shadow)
-    (210, 195, 170),    # 14 cream              (skin→white transition)
+    "navy_blue":      (28, 45, 78),
+    "mid_blue":       (55, 80, 120),
+    "sky_blue":       (120, 170, 220),
+
+    "dark_green":     (60, 110, 60),
+    "light_green":    (140, 170, 100),
+
+    "red":            (200, 50, 60),
+    "yellow":         (230, 180, 60),
+}
+
+
+# ── PORTRAIT PALETTE (14 Colors) ──────────────────────────
+# Excludes pure greens, pure reds, and yellows to prevent skin bleed
+PORTRAIT_PALETTE = [
+    MASTER_COLORS["black"], MASTER_COLORS["dark_gray"], MASTER_COLORS["mid_gray"], MASTER_COLORS["white"],
+    MASTER_COLORS["skin_deep"], MASTER_COLORS["skin_dark"], MASTER_COLORS["skin_mid"], MASTER_COLORS["skin_light"],
+    MASTER_COLORS["skin_highlight"], MASTER_COLORS["skin_bright"],
+    MASTER_COLORS["red_brown"], MASTER_COLORS["cream"],
+    MASTER_COLORS["navy_blue"], MASTER_COLORS["mid_blue"]
 ]
-# BEAD_PALETTE = [
-#     (0, 0, 0),
-#     (255, 255, 255),
-#     (80, 80, 80),
-#     (180, 180, 180),
-#     (255, 200, 150),
-#     (180, 110, 60),
-#     (40, 90, 50),
-#     (100, 150, 90),
-#     (180, 220, 140),
-#     (60, 110, 180),
-#     (150, 190, 230),
-#     (250, 160, 60),
-# ]
+
+# ── GENERAL PALETTE (16 Colors) ───────────────────────────
+# Has greens/reds/yellows, but uses fewer specialized skin tones
+GENERAL_PALETTE = [
+    MASTER_COLORS["black"], MASTER_COLORS["dark_gray"], MASTER_COLORS["mid_gray"], MASTER_COLORS["white"],
+    MASTER_COLORS["skin_deep"], MASTER_COLORS["skin_mid"], MASTER_COLORS["skin_light"], MASTER_COLORS["skin_bright"],
+    MASTER_COLORS["red_brown"],
+    MASTER_COLORS["navy_blue"], MASTER_COLORS["sky_blue"],
+    MASTER_COLORS["dark_green"], MASTER_COLORS["light_green"],
+    MASTER_COLORS["red"], MASTER_COLORS["yellow"]
+]
+
+# Keep BEAD_PALETTE around so we don't break other imports
+BEAD_PALETTE = GENERAL_PALETTE

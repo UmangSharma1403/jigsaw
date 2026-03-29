@@ -3,3 +3,5 @@ numpy==2.0.2
 pillow==11.3.0
 python-multipart==0.0.20
 uvicorn==0.39.0
+opencv-contrib-python==4.13.0.92
+scikit-image==0.26.0

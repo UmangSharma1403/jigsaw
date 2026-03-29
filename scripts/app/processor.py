@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 from PIL import Image, ImageEnhance, ImageDraw, ImageFilter
 from skimage import color as skcolor
-from .palette import BEAD_PALETTE
+from .palette import PORTRAIT_PALETTE, GENERAL_PALETTE
 
 GRID_W = 70
 GRID_H = 70
@@ -13,12 +13,15 @@ GRID_LINE_WIDTH = 1
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ── Build LAB palette ONCE at startup ────────────────────
-PALETTE_ARR    = np.array(BEAD_PALETTE, dtype=np.float32) / 255.0
-PALETTE_LAB    = skcolor.rgb2lab(
-    PALETTE_ARR.reshape(len(BEAD_PALETTE), 1, 3)
-).reshape(len(BEAD_PALETTE), 3)
-PALETTE_RGB_U8 = np.array(BEAD_PALETTE, dtype=np.uint8)
+# ── Build LAB palettes ONCE at startup ────────────────────
+def build_lab_palette(palette):
+    arr = np.array(palette, dtype=np.float32) / 255.0
+    lab = skcolor.rgb2lab(arr.reshape(len(palette), 1, 3)).reshape(len(palette), 3)
+    rgb_u8 = np.array(palette, dtype=np.uint8)
+    return lab, rgb_u8
+
+PORTRAIT_LAB, PORTRAIT_RGB = build_lab_palette(PORTRAIT_PALETTE)
+GENERAL_LAB, GENERAL_RGB   = build_lab_palette(GENERAL_PALETTE)
 
 
 def detect_portrait(img_cv: np.ndarray) -> bool:
@@ -143,18 +146,18 @@ def enhance(img: Image.Image) -> Image.Image:
     return img
 
 
-def vectorized_knn(img: Image.Image) -> np.ndarray:
+def vectorized_knn(img: Image.Image, palette_lab: np.ndarray) -> np.ndarray:
     pixels     = np.array(img, dtype=np.float32) / 255.0
     pixels_lab = skcolor.rgb2lab(pixels)
     flat_lab   = pixels_lab.reshape(-1, 3)
-    diff       = flat_lab[:, np.newaxis, :] - PALETTE_LAB[np.newaxis, :, :]
+    diff       = flat_lab[:, np.newaxis, :] - palette_lab[np.newaxis, :, :]
     distances  = np.linalg.norm(diff, axis=2)
     nearest    = np.argmin(distances, axis=1)
     return nearest.reshape(GRID_H, GRID_W)
 
 
-def render_grid(grid_labels: np.ndarray) -> Image.Image:
-    colored    = PALETTE_RGB_U8[grid_labels]
+def render_grid(grid_labels: np.ndarray, palette_rgb: np.ndarray) -> Image.Image:
+    colored    = palette_rgb[grid_labels]
     scaled     = colored.repeat(CELL_PIXELS, axis=0).repeat(CELL_PIXELS, axis=1)
     output_img = Image.fromarray(scaled, mode="RGB")
     draw       = ImageDraw.Draw(output_img)
@@ -183,16 +186,20 @@ def process_image(img: Image.Image):
     img    = img.convert("RGB")
     img_cv = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
-    if detect_portrait(img_cv):
+    is_portrait = detect_portrait(img_cv)
+
+    if is_portrait:
         print('   Image type: portrait')
         img = portrait_crop(img, img_cv)
+        pal_lab, pal_rgb = PORTRAIT_LAB, PORTRAIT_RGB
     else:
         print('   Image type: general — saliency crop')
         img = saliency_crop(img, img_cv)
+        pal_lab, pal_rgb = GENERAL_LAB, GENERAL_RGB
 
     img         = letterbox_resize(img, (GRID_W, GRID_H))
     img         = enhance(img)
-    grid_labels = vectorized_knn(img)
-    output_img  = render_grid(grid_labels)
+    grid_labels = vectorized_knn(img, pal_lab)
+    output_img  = render_grid(grid_labels, pal_rgb)
 
     return output_img, grid_labels
