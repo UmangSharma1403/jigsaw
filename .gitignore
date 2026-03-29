@@ -8,7 +8,7 @@ __pycache__/
 venv/
 .env/
 ven/
-
+pitara/
 # Output folders
 output/
 
